@@ -35,7 +35,9 @@ function readDeviceInfo() {
     if (!fs.existsSync(file)) {
         throw new CustomError(404, `缺少设备指纹文件 ${file}，付费声音无法下载，采集方法见 README`)
     }
-    const info = JSON.parse(fs.readFileSync(file, 'utf8'))
+    // 去掉 UTF-8 BOM：这个文件是用户自己采集后手工放的，
+    // 用记事本保存会带上 BOM，JSON.parse 会直接抛错
+    const info = JSON.parse(fs.readFileSync(file, 'utf8').replace(/^\uFEFF/, ''))
     for (const key of INTERNAL_KEYS) {
         delete info[key]
     }
